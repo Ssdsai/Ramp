@@ -1,5 +1,8 @@
 # Instructions
 
+Please Open This Link to View the Working
+https://codesandbox.io/p/github/Ssdsai/Ramp/draft/upbeat-sanderson
+
 Welcome to Ramp's frontend interview challenge.
 
 In this challenge, you will need to fix certain bugs within the starter code provided to you.
@@ -197,7 +200,7 @@ _You need to fix some of the previous bugs in order to reproduce_
 
 You will submit a link to a CodeSandbox with your responses. Make sure your CodeSandbox has the shape of this Regex: `/^https:\/\/codesandbox\.io\/p\/sandbox\/[a-z\d]{6}$/`. _See [Coding](#coding)_
 
----
+---  https://codesandbox.io/p/github/Ssdsai/Ramp/draft/upbeat-sanderson
 
 ### Callouts
 
