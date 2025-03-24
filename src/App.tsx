@@ -7,6 +7,7 @@ import { usePaginatedTransactions } from "./hooks/usePaginatedTransactions"
 import { useTransactionsByEmployee } from "./hooks/useTransactionsByEmployee"
 import { EMPTY_EMPLOYEE } from "./utils/constants"
 import { Employee } from "./utils/types"
+//import { setTransactionApproval } from "./utils/requests"
 
 export function App() {
   const { data: employees, ...employeeUtils } = useEmployees()
@@ -14,6 +15,7 @@ export function App() {
   const { data: transactionsByEmployee, ...transactionsByEmployeeUtils } = useTransactionsByEmployee()
   const [isLoading, setIsLoading] = useState(false)
   const [isFilterLoading, setIsFilterLoading] = useState(false)
+  const [transactionState, setTransactionState] = useState<Map<string, boolean>>(new Map())
 
   const transactions = useMemo(
     () => paginatedTransactions?.data ?? transactionsByEmployee ?? null,
@@ -30,7 +32,18 @@ export function App() {
 
     await paginatedTransactionsUtils.fetchAll()
     setIsLoading(false)
-  }, [employeeUtils, paginatedTransactionsUtils, transactionsByEmployeeUtils])
+
+    const storedState = localStorage.getItem("transactionState")
+    if (storedState) {
+      setTransactionState(new Map(JSON.parse(storedState)))
+    } else if (transactions) {
+      const initialState = new Map<string, boolean>()
+      transactions.forEach((transaction) => {
+        initialState.set(transaction.id, transaction.approved)
+      })
+      setTransactionState(initialState)
+    }
+  }, [employeeUtils, paginatedTransactionsUtils, transactionsByEmployeeUtils, transactions])
 
   const loadTransactionsByEmployee = useCallback(
     async (employeeId: string) => {
@@ -45,6 +58,14 @@ export function App() {
       loadAllTransactions()
     }
   }, [employeeUtils.loading, employees, loadAllTransactions])
+
+  const handleTransactionChange = (transactionId: string, newValue: boolean) => {
+    setTransactionState((prevState) => {
+      const updatedState = new Map(prevState).set(transactionId, newValue)
+      localStorage.setItem("transactionState", JSON.stringify([...updatedState]))
+      return updatedState
+    })
+  }
 
   return (
     <Fragment>
@@ -80,7 +101,11 @@ export function App() {
         <div className="RampBreak--l" />
 
         <div className="RampGrid">
-          <Transactions transactions={transactions} />
+          <Transactions
+            transactions={transactions}
+            approvedTransactions={transactionState}
+            onTransactionApproval={handleTransactionChange}
+          />
 
           {transactions !== null &&
             paginatedTransactions !== null &&
